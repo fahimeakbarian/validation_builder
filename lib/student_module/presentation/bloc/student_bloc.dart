@@ -8,7 +8,6 @@ part 'student_event.dart';
 part 'student_state.dart';
 
 class StudentFormBloc extends Bloc<StudentFormEvent, StudentFormState> {
-  // we shoule use get it for this injection but this is not my go;d of this repo
   final StudentValidator studentValidator = StudentValidator();
 
   final firstnameController = TextEditingController();
