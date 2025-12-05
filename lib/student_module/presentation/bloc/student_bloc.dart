@@ -8,18 +8,20 @@ part 'student_event.dart';
 part 'student_state.dart';
 
 class StudentFormBloc extends Bloc<StudentFormEvent, StudentFormState> {
-  final StudentValidator studentValidator = StudentValidator();
-
   final firstnameController = TextEditingController();
   final lastnameController = TextEditingController();
   final emailController = TextEditingController();
+  final StudentValidator studentValidator = StudentValidator();
 
   StudentFormBloc() : super(StudentFormState()) {
     on<FirstnameChanged>((event, emit) {
-      final error = studentValidator.validator.validateSingle(
-        studentValidator.firstnameId,
-        event.value,
+      final entity = StudentEntity(
+        firstname: event.value,
+        lastname: state.lastname,
+        email: state.email,
       );
+
+      final error = studentValidator.validateFirstName(entity);
 
       final newState = state.copyWith(
         firstname: event.value,
@@ -30,10 +32,13 @@ class StudentFormBloc extends Bloc<StudentFormEvent, StudentFormState> {
     });
 
     on<LastnameChanged>((event, emit) {
-      final error = studentValidator.validator.validateSingle(
-        studentValidator.lastnameId,
-        event.value,
+      final entity = StudentEntity(
+        firstname: state.firstname,
+        lastname: event.value,
+        email: state.email,
       );
+
+      final error = studentValidator.validateLastName(entity);
 
       final newState = state.copyWith(
         lastname: event.value,
@@ -44,11 +49,13 @@ class StudentFormBloc extends Bloc<StudentFormEvent, StudentFormState> {
     });
 
     on<EmailChanged>((event, emit) {
-      final error = studentValidator.validator.validateSingle(
-        studentValidator.emailId,
-        event.value,
+      final entity = StudentEntity(
+        firstname: state.firstname,
+        lastname: state.lastname,
+        email: event.value,
       );
 
+      final error = studentValidator.validateEmail(entity);
       final newState = state.copyWith(email: event.value, emailError: error);
 
       emit(newState);

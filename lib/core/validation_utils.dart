@@ -49,9 +49,8 @@ class RegexRule<T> extends Rule<T> {
 typedef PropertyGetter<T, P> = P Function(T);
 
 class PropertyBuilder<T, P> {
-  PropertyBuilder(this.getter, this.id);
+  PropertyBuilder(this.getter);
   final PropertyGetter<T, P> getter;
-  final int id;
   final List<Rule<P>> _rules = <Rule<P>>[];
 
   PropertyBuilder<T, P> isNotEmpty({final String message = "is empty"}) {
@@ -75,7 +74,7 @@ class PropertyBuilder<T, P> {
     return this;
   }
 
-  String? validateSingle(final P value) {
+  String? validateSingle(P value) {
     for (final Rule<P> rule in _rules) {
       final String? error = rule.validate(value);
       if (error != null) return error;
@@ -96,21 +95,19 @@ class PropertyBuilder<T, P> {
 
 class ValidationBuilder<T> {
   final List<PropertyBuilder<T, dynamic>> _props = [];
-  int _counter = 0;
 
   PropertyBuilder<T, P> property<P>(PropertyGetter<T, P> getter) {
-    final id = _counter++;
-    final PropertyBuilder<T, P> p = PropertyBuilder<T, P>(getter, id);
-    _props.add(p);
-    return p;
+    final PropertyBuilder<T, P> pb = PropertyBuilder<T, P>(getter);
+    _props.add(pb);
+    return pb;
   }
 
   List<String> validate(T model) {
     return _props.expand((p) => p.validate(model)).toList();
   }
 
-  String? validateSingle(int id, dynamic value) {
-    final prop = _props.where((x) => x.id == id).first;
-    return prop.validateSingle(value);
+  String? validateSingle<P>(T model, PropertyBuilder<T, P> property) {
+    final value = property.getter(model);
+    return property.validateSingle(value);
   }
 }

@@ -2,28 +2,41 @@ import 'package:flutter_project/core/validation_utils.dart';
 import 'package:flutter_project/student_module/domain/student_entity.dart';
 
 class StudentValidator {
-  late final int firstnameId;
-  late final int lastnameId;
-  late final int emailId;
-
   final validator = ValidationBuilder<StudentEntity>();
 
+  late final PropertyBuilder<StudentEntity, String?> firstName;
+  late final PropertyBuilder<StudentEntity, String?> email;
+  late final PropertyBuilder<StudentEntity, String?> lastName;
+
   StudentValidator() {
-    firstnameId = validator
+    lastName = validator
+        .property((s) => s.lastname)
+        .isNotEmpty(message: "lastname  required")
+        .maxLength(3);
+
+    firstName = validator
         .property((s) => s.firstname)
         .isNotEmpty(message: "First name required")
-        .maxLength(3)
-        .id;
+        .maxLength(3);
 
-    lastnameId = validator
-        .property((s) => s.lastname)
-        .isNotEmpty(message: "Last name required")
-        .maxLength(3)
-        .id;
-
-    emailId = validator
+    email = validator
         .property((s) => s.email)
-        .matches(RegExp(r".+@.+\..+"), message: "Invalid email")
-        .id;
+        .matches(RegExp(r".+@.+\..+"), message: "Invalid email");
+  }
+
+  List<String> validate(StudentEntity model) {
+    return validator.validate(model);
+  }
+
+  String? validateFirstName(StudentEntity model) {
+    return validator.validateSingle(model, firstName);
+  }
+
+  String? validateEmail(StudentEntity model) {
+    return validator.validateSingle(model, email);
+  }
+
+  String? validateLastName(StudentEntity model) {
+    return validator.validateSingle(model, lastName);
   }
 }
